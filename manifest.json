@@ -1,0 +1,19 @@
+﻿
+{
+  "name": "Casablanca Quiz - Wach Nta Casaoui",
+  "short_name": "Casa Quiz",
+  "description": "Le quiz des vrais Casaouis",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#08172b",
+  "theme_color": "#08172b",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

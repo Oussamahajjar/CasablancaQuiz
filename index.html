@@ -1,0 +1,293 @@
+﻿
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08172b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Casa Quiz">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>Casa Quiz - واش نتا كازاوي؟</title>
+
+<style>
+*{box-sizing:border-box}
+html{min-height:100%;background:#08172b}
+body{
+ margin:0;
+ min-height:100vh;
+ font-family:Arial,sans-serif;
+ color:#fff;
+ background:radial-gradient(circle at 80% 0%,#16536a,#08172b 60%);
+}
+.wrap{
+ max-width:480px;
+ margin:auto;
+ padding:calc(28px + env(safe-area-inset-top)) 20px
+ calc(30px + env(safe-area-inset-bottom));
+}
+.hidden{display:none!important}
+.center{text-align:center}
+.flag{font-size:52px}
+.eyebrow{color:#61e4c0;font-size:12px;letter-spacing:4px;font-weight:bold}
+h1{font-size:46px;line-height:1.05;margin:18px 0}
+h2{font-size:25px;line-height:1.35}
+.muted{color:#a6b8c9;line-height:1.7}
+.arabic{font-size:25px;color:#6ff3ce;font-weight:bold}
+.card{
+ background:rgba(255,255,255,.075);
+ border:1px solid rgba(255,255,255,.12);
+ border-radius:25px;
+ padding:24px;
+ margin-top:25px;
+ box-shadow:0 20px 45px rgba(0,0,0,.2);
+}
+.pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.pill{background:#17394d;padding:10px 13px;border-radius:25px;font-size:12px}
+.btn{
+ display:block;width:100%;
+ border:0;border-radius:15px;
+ padding:17px;margin-top:20px;
+ font-size:17px;font-weight:bold;
+ color:#062c2b;
+ background:linear-gradient(110deg,#4ce4bc,#9df4d9);
+ cursor:pointer;
+}
+.btn:active{transform:scale(.98)}
+.secondary{background:#19394f;color:white}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px}
+.chip{padding:9px 12px;border-radius:12px;background:#18394f}
+.clock{background:#7c2940}
+.bar{height:9px;background:#203e52;border-radius:20px;overflow:hidden;margin:22px 0}
+.fill{height:100%;width:0;background:#5ee9bd;transition:width .3s}
+.question{font-size:23px;line-height:1.45;margin:18px 0 24px}
+.answer{
+ display:flex;align-items:center;gap:12px;
+ width:100%;margin:10px 0;padding:16px;
+ border-radius:15px;border:1px solid #365269;
+ background:#15344b;color:#fff;text-align:left;
+ font-size:15px;cursor:pointer;
+}
+.letter{
+ display:grid;place-items:center;
+ min-width:31px;height:31px;
+ background:#28495e;border-radius:9px;font-weight:bold;
+}
+.correct{background:#125c49!important;border-color:#43e3ac!important}
+.wrong{background:#692a3d!important;border-color:#f2788a!important}
+.answer:disabled{cursor:default;opacity:1}
+.feedback{min-height:26px;margin-top:15px;color:#9ff2d4;font-weight:bold}
+.bigscore{font-size:65px;font-weight:bold;color:#6ef2c9}
+footer{color:#7c9aaf;text-align:center;font-size:12px;margin-top:35px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section id="home" class="center">
+ <div class="flag">🇲🇦</div>
+ <p class="eyebrow">THE CITY CHALLENGE</p>
+ <h1>CASA<br>QUIZ<span style="color:#61e4c0">.</span></h1>
+ <p class="arabic" dir="rtl">واش نتا كازاوي؟</p>
+ <p class="muted">Tu connais vraiment Casablanca ?<br>Prouve-le en 10 questions.</p>
+
+ <div class="card">
+  <div class="pills">
+   <span class="pill">🧠 10 questions</span>
+   <span class="pill">⏱ 15 secondes</span>
+   <span class="pill">🏆 100 points</span>
+  </div>
+  <h2>Prêt pour le défi ?</h2>
+  <p class="muted">Des Habous à Aïn Diab, découvre si tu es un vrai Casaoui.</p>
+  <button class="btn" onclick="startGame()">COMMENCER →</button>
+  <p class="muted">🏅 Meilleur score : <strong id="bestHome">0</strong>/100</p>
+ </div>
+</section>
+
+<section id="game" class="hidden">
+ <div class="top">
+  <span class="chip" id="number">01 / 10</span>
+  <span class="chip" id="score">⭐ 0 pts</span>
+  <span class="chip clock" id="timer">⏱ 15s</span>
+ </div>
+ <div class="bar"><div class="fill" id="progress"></div></div>
+ <div class="card">
+  <p class="eyebrow">CASABLANCA CHALLENGE</p>
+  <h2 class="question" id="question"></h2>
+  <div id="answers"></div>
+  <div class="feedback" id="feedback" aria-live="polite"></div>
+  <button class="btn hidden" id="next" onclick="nextQuestion()">SUIVANT →</button>
+ </div>
+</section>
+
+<section id="result" class="center hidden">
+ <div class="flag">🏆</div>
+ <p class="eyebrow">CHALLENGE TERMINÉ</p>
+ <h1 id="resultTitle">BRAVO !</h1>
+ <div class="card">
+  <p class="muted">TON SCORE FINAL</p>
+  <div class="bigscore" id="finalScore">0/100</div>
+  <p class="arabic" id="resultArabic" dir="rtl"></p>
+  <p class="muted" id="resultText"></p>
+  <p class="muted" id="bestResult"></p>
+  <button class="btn" onclick="startGame()">REJOUER ↻</button>
+  <button class="btn secondary" onclick="goHome()">ACCUEIL</button>
+ </div>
+</section>
+
+<footer>MADE WITH ❤️ FOR CASABLANCA 🇲🇦</footer>
+</div>
+
+<script>
+var questions=[
+ {q:"Quel est l'ancien nom de Casablanca ?",
+  a:["Anfa","Mogador","Tingis","Mazagan"],c:0},
+ {q:"Quel océan borde Casablanca ?",
+  a:["Méditerranée","Atlantique","Indien","Pacifique"],c:1},
+ {q:"Quelle mosquée emblématique se trouve à Casablanca ?",
+  a:["Koutoubia","Al Quaraouiyine","Hassan II","Tinmel"],c:2},
+ {q:"Quel quartier est connu pour sa corniche et ses plages ?",
+  a:["Derb Sultan","Aïn Diab","Habous","Sidi Othmane"],c:1},
+ {q:"Quel grand stade historique est situé à Casablanca ?",
+  a:["Stade Adrar","Stade Ibn Batouta","Stade Mohammed V","Stade de Fès"],c:2},
+ {q:"Quel quartier est connu pour son marché et son architecture traditionnelle ?",
+  a:["Les Habous","Californie","Sidi Maârouf","Bouskoura"],c:0},
+ {q:"Quel moyen de transport circule sur des rails dans les rues de Casa ?",
+  a:["Métro","Tramway","Téléphérique","Funiculaire"],c:1},
+ {q:"Quel phare célèbre se trouve à Casablanca ?",
+  a:["Phare d'El Hank","Phare du Cap Spartel","Phare de Sidi Bouafi","Phare du Cap Ghir"],c:0},
+ {q:"Quel bâtiment historique de Casablanca est célèbre pour son style Art déco ?",
+  a:["Palais Bahia","Cinéma Rialto","Kasbah des Oudayas","Tour Hassan"],c:1},
+ {q:"Quelle grande place est connue pour ses bâtiments administratifs au centre de Casablanca ?",
+  a:["Place Jemaa el-Fna","Place du 9 Avril","Place Mohammed V","Place des Alaouites"],c:2}
+];
+
+var order=[],current=0,points=0,left=15,tick=null,locked=false;
+var best=0;
+try{best=parseInt(localStorage.getItem("casaBest")||"0",10)||0}catch(e){}
+
+function el(id){return document.getElementById(id)}
+function screen(id){
+ ["home","game","result"].forEach(function(x){el(x).className=x===id?"":"hidden"});
+}
+function shuffle(arr){
+ for(var i=arr.length-1;i>0;i--){
+  var j=Math.floor(Math.random()*(i+1));
+  var t=arr[i];arr[i]=arr[j];arr[j]=t;
+ }
+}
+function startGame(){
+ clearInterval(tick);
+ order=questions.slice();
+ shuffle(order);
+ current=0;points=0;
+ screen("game");
+ showQuestion();
+}
+function showQuestion(){
+ locked=false;left=15;
+ var q=order[current];
+ el("number").textContent=(current+1)+" / "+order.length;
+ el("score").textContent="⭐ "+points+" pts";
+ el("timer").textContent="⏱ 15s";
+ el("progress").style.width=((current+1)/order.length*100)+"%";
+ el("question").textContent=q.q;
+ el("feedback").textContent="";
+ el("next").className="btn hidden";
+ var area=el("answers");area.innerHTML="";
+ var choices=q.a.map(function(value,i){return {value:value,index:i}});
+ shuffle(choices);
+ choices.forEach(function(choice,i){
+  var b=document.createElement("button");
+  b.className="answer";
+  b.dataset.index=choice.index;
+  var letter=document.createElement("span");
+  letter.className="letter";
+  letter.textContent="ABCD".charAt(i);
+  var label=document.createElement("span");
+  label.textContent=choice.value;
+  b.appendChild(letter);b.appendChild(label);
+  b.onclick=function(){answer(choice.index)};
+  area.appendChild(b);
+ });
+ clearInterval(tick);
+ tick=setInterval(function(){
+  left--;
+  el("timer").textContent="⏱ "+left+"s";
+  if(left<=0)answer(-1);
+ },1000);
+}
+function answer(index){
+ if(locked)return;
+ locked=true;clearInterval(tick);
+ var correct=order[current].c;
+ var buttons=el("answers").getElementsByTagName("button");
+ for(var i=0;i<buttons.length;i++){
+  var n=parseInt(buttons[i].dataset.index,10);
+  buttons[i].disabled=true;
+  if(n===correct)buttons[i].className="answer correct";
+  else if(n===index)buttons[i].className="answer wrong";
+ }
+ if(index===correct){
+  points+=10;
+  el("feedback").textContent="✅ Bonne réponse ! +10 points";
+ }else if(index===-1){
+  el("feedback").textContent="⏰ Temps écoulé !";
+ }else{
+  el("feedback").textContent="❌ Bonne réponse : "+order[current].a[correct];
+ }
+ el("score").textContent="⭐ "+points+" pts";
+ el("next").textContent=current===order.length-1?"VOIR LE RÉSULTAT →":"SUIVANT →";
+ el("next").className="btn";
+}
+function nextQuestion(){
+ if(!locked)return;
+ current++;
+ if(current>=order.length)showResult();
+ else showQuestion();
+}
+function showResult(){
+ clearInterval(tick);screen("result");
+ if(points>best){
+  best=points;
+  try{localStorage.setItem("casaBest",String(best))}catch(e){}
+ }
+ el("finalScore").textContent=points+"/100";
+ el("bestResult").textContent="🏅 Meilleur score : "+best+"/100";
+ if(points===100){
+  el("resultTitle").textContent="LÉGENDE DE CASA 👑";
+  el("resultArabic").textContent="نتا ولد كازا بصح!";
+  el("resultText").textContent="Score parfait ! Tu connais Casa par cœur.";
+ }else if(points>=70){
+  el("resultTitle").textContent="VRAI CASAOUI 🔥";
+  el("resultArabic").textContent="برافو عليك!";
+  el("resultText").textContent="Très belle performance !";
+ }else if(points>=40){
+  el("resultTitle").textContent="PAS MAL 😎";
+  el("resultArabic").textContent="باقي خاصك تعرف كازا!";
+  el("resultText").textContent="Encore un petit effort !";
+ }else{
+  el("resultTitle").textContent="TOURISTE 😂";
+  el("resultArabic").textContent="سير دور شوية فكازا!";
+  el("resultText").textContent="Rejoue pour améliorer ton score.";
+ }
+}
+function goHome(){
+ clearInterval(tick);
+ el("bestHome").textContent=best;
+ screen("home");
+}
+goHome();
+
+if("serviceWorker" in navigator){
+ window.addEventListener("load",function(){
+  navigator.serviceWorker.register("./sw.js").catch(function(e){
+   console.log("Offline setup:",e);
+  });
+ });
+}
+</script>
+</body>
+</html>
